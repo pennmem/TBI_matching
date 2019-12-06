@@ -19,6 +19,7 @@ cols_cat  = c("Subject"          ,    "Sex"                   ,  "Handedness"   
 
 cols_num = c("Age", "Years.of.Education",  "Age.of.Seizure.Onset", "fr1_recall_rate"   ,   "catfr1_recall_rate" ,  "nfr1", "ncatfr1", "avg_recall_rate")
 
+# convert to correct types
 df %<>%mutate_each_(funs(as.factor(.)), cols_cat)
 df %<>%mutate_each_(funs(as.numeric(.)), cols_num)
 
