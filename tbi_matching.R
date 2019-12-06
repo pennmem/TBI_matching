@@ -24,6 +24,7 @@ df %<>%mutate_each_(funs(as.factor(.)), cols_cat)
 df %<>%mutate_each_(funs(as.numeric(.)), cols_num)
 
 
+# compute weights to deal with class imbalance (few TBI subjects) to pass them into the regression model
 n_pos = sum(df[,'is_TBI'] == 1)
 n_tot = dim(df)[1]
 pos_weight = n_tot/n_pos
