@@ -36,12 +36,11 @@ weights[df[,'is_TBI'] != 1] = neg_weight
 
 # create a propensity score model 
 
-
 # demographics model
 glm1 <- glm(is_TBI ~ Sex + Age + Age.of.Seizure.Onset + Prior.Resection, data=df, weights = weights, family = 'quasibinomial')
 
 
-# coverage model
+# electrode coverage model
 glm2 <- glm(is_TBI ~ Left.Frontal + Right.Frontal + Left.Temporal + Right.Temporal
             + Left.Parietal + Right.Parietal + Left.Occipital + Right.Occipital +
               Left.Limbic + Right.Limbic + Left.Insula + Right.Insula + Depth +
@@ -52,24 +51,21 @@ summary(glm1)
 
 X1 = glm1$fitted  # get propensity scores, which are the regression's predictions
 X2 = glm2$fitted
-
 X3 = df$Handedness  # match handedness exactly
-
 X = cbind(X1,X2,X3)  # create matching criteria
 Treat = df$is_TBI
 Treat = Treat == 1  # convert is_TBI to true or false, required by the Match package
 
 
 n_matches = 1
-rr_full = Match(Tr = Treat, X = cbind(X1,X2,X3) , M = n_matches, replace = F, exact = c(F,F,T))  # exact specifies whether the matches have to be exact. In this case, we match handedness exactly. M = 2 specifies the number of matches per subject
+rr_full = Match(Tr = Treat, X = X, M = n_matches, replace = F, exact = c(F,F,T))  # exact specifies whether the matches have to be exact. In this case, we match handedness exactly. M = 2 specifies the number of matches per subject
 print(rr_full)
 
 # check match balances for a couple of variables
 mb_full = MatchBalance(Treat ~ Sex + Age + Handedness + Age.of.Seizure.Onset + Prior.Resection + Left.Temporal + Left.Frontal + Right.Temporal, data = df, match.out = rr_full, nboots = 1000, paired =  T, print.level = T)
 
 
-
-# two step process
+# two step process (not good :( )
 n_matches = 3
 rr1 = Match(Tr = Treat, X = cbind(X1,X3) , M = n_matches, replace = F, exact = c(F,T))  # exact specifies whether the matches have to be exact. In this case, we match handedness exactly. M = 2 specifies the number of matches per subject
 print(rr1)
